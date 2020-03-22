@@ -1,0 +1,133 @@
+TensorFlow网站：https://tensorflow.google.cn/api_docs/python/tf?hl=zh_cn
+TensorFlow里，操作必须属于同个图，不同图中的节点无法相连,数据是二进制的
+加：add 减：subtract 乘：matmul（矩阵点乘）multiply数字乘 除：tf.divide
+TensorFlow里的运算需要类型一致，即浮点型与整形无法运算。
+tf.Session：会话的启动与关闭：sess=tf.Session() ,sess.close()  with tf.Session() as sess: 这种方式会在运行完之后自动关闭会话，一般是使用with这种。注意S大写。注意，如果会话前定义了操作而没有在会话中得到执行，那么之前定义的函数就不会生效。
+run:result = sess.run(a) [注：sess=tf.Session()],就可以得到a的结果值。如果传递的fetches是一个列表，那么返回的是一个list集合，如 result2=tf.run(fetches=[a,b])（与eval操作类似，eval是直接由tensor对象调用如，a.eval()，而run方法是Session类里的）
+如果两个值没有依赖联系，那么涉及到他们的计算会并行运行。
+tf.constant：定义常量
+构建Session时常用的两个设置(GPU版本，CPU版默认就行)：(https://www.jianshu.com/p/0bed3e652547)
+config = tf.ConfigProto(allow_soft_placement=True)
+config.gpu_options.per_process_gpu_memory_fraction = 0.4  #占用40%显存
+sess = tf.Session(config=config)
+
+tf.reduce_sum:求和，axis=0是列求和，=1是行
+tf.reduce_mean:求均值,若不指定axis，则是所有元素的均值
+
+tf.Variable：变量被定义以前必须先进行初始化操作，必须放到会话下面，且必须放在所有运行操作之前。 sess.run(tf.global_Variables_initializer())【就是这个操作要放在会话最前】注意V大写
+注意：变量相乘的时候，w1是已定义变量
+w2= tf.variable(w1.initialized_value()*2.0) 别写w1*2.0，否则w2数据可能会变
+若变量的纬度形式要发生变化，则要把validate_shape =False
+理解一下并行执行：两个同等地位的运算是并行的，如两个操作都用到同一个随机变量且两代码临近，则会同时进行，他们获取的随机变量是一样的。
+
+tf.assign：更新变量  a = tf.assign(c,b),意思为把b的值赋给c,若之后在会话中执行 sess.run(a)，后a和c的值与b一样，如果后面没有在会话中执行的话，则c不会改变。如果还有一个值是b=多少c，注意b从始至终都不会有改变。更新操作只能用这个，不能按常规的x=x+1，否则x的值不会改变。
+
+tf.placeholder:占位符，使用的时候再给定参数。
+tf.concat：张量拼接，axis=0,相当于扩张了行，=1相当于扩张了列
+
+tf.control_dependencies:控制依赖，在执行某个操作之前先执行特定操作，注意传入的参数要是列表
+
+tf.get_variable：获取已经存在的变量，如果没有则会新建，可共享变量，它是以指定的name属性为唯一标识，而不是定义的变量名称，所以不能同时定义两个变量name是相同的。配合语句
+with tf.variable_scope('op1',reuse=tf.AUTO_REUSE)使用（相当于创建局部变量域）
+initializer：创建变量的初始化器。如果初始化器为 None（默认），则将使用在变量范围内传递的默认初始化器(如果另一个也是 None，那么一个 glorot_uniform_initializer （也称之为Xavier uniform initializer）将被使用)。初始化器也可以是张量，在这种情况下，变量被初始化为该值和形状，要使用其他张量的话，不能指定形状
+
+TensorFlow可视化图：tf.summary.FileWriter(‘./路径’,sess.graph)
+先cmd运行tensorboard --help c:\** 然后网站打开localhost.6006
+
+数据存储：saver=tf.train.Saver() 
+with tf.Session() as sess:
+saver.save(sess,’./ceshi’)
+加载方式1，之前保存的数据需要重新定义一遍：
+saver=tf.train.Saver() 
+with tf.Session() as sess:
+saver.restore(sess,’./***/model.mkpt’)
+加载方式2：无需定义变量，但是加载麻烦
+saver = tf.train.import_meta_graph('./ceshi.meta')
+with tf.Session() as sess:
+    saver.restore(sess,'./ceshi')
+    print(sess.run(tf.get_default_graph().get_tensor_by_name('a1:0')))
+
+tf.flags:可以帮助我们通过命令行来动态的更改代码中的参数，若在命令行中重新定义参数则会按照新参数来执行，没有参数输入则按原定义的参数执行
+
+BP算法：https://www.cnblogs.com/duanhx/p/9655213.html
+激活函数：主要用sigmoid函数
+
+
+
+卷积神经网络（CNN，主要应用为图像分类）：
+卷积层的局部感知：相比全连接网络减少了很多参数与计算
+窗口大小一般选奇数，保证一个重叠信息
+参数共享：一次是同一个核
+滑动窗口重叠：使窗口与窗口边缘有一定平滑性
+激活函数：主要用ReLU函数（模拟脑神经元）
+池化：压缩参数和数据量，减少过拟合
+池化策略：最大池化（主要）、 平均池化
+全连接层（FC层）：汇总观测,tf.layers.dense
+BN层（很少用到）：使数据按照高斯分布，好处是保证较大梯度并防止梯度消失/爆炸
+
+整个过程：输入预处理-->卷积局部感知-->激励实现非线性转换-->池化减少参数与数据量-->全连接总体观测-->输出
+
+dropout：每次更新时随机使用一半左右的神经元进行训练，下个回合恢复所有神经元并再次随机选择一半的训练，减少过拟合。只能在训练集上做此操作。
+API用tf.layers里面的
+tf.nn.conv2d：卷积  # padding: 只支持两个参数"SAME", "VALID"，当取值为SAME的时候，表示进行填充，"在TensorFlow中，如果步长为1，并且padding为SAME的时候，经过卷积之后的图像大小是不变的"
+tf.nn.relu：激励函数 tf.nn.max_pool：池化
+tf.nn.bias_add()：将一个一维向量对应位置加到另一个向量上（要求该向量与一维向量的列数相同），卷积加偏置项的时候用
+tf.argmax:对矩阵按行或列计算最大值对应的下标，和numpy中的一样
+tf.equal:是对比这两个矩阵或者向量的相等的元素，如果是相等的那就返回True，反正返回False，返回的值的矩阵维度和A是一样的
+tf.cast()：作用是执行 tensorflow 中张量数据类型转换
+tf.train.exponential_decay()：学习率指数衰减
+tf.nn.lrn():归一化
+tf.train.AdamOptimizer：优化器，比随机梯度要好，一般用这个
+数据名.train.next_batch(batch_size)：获取一个批次的数据（train_x = X[step * batch_size:step * batch_size + batch_size]）
+tf.cast():转换数据类型，如布尔类型转换为数值型
+
+RNN：（循环神经网络）
+St=f(UXt+WSt-1)
+参数：与传统深度神经网络中每一层使用不同的参数的做法不同，RNN在所有时刻中共享相同的参数U、V、W。这反应了在每一步中都在执行相同的任务，只是用了不同的输入。这极大地减少了需要学习的参数的个数。
+LSTM：需记住结构图
+Peephole：把之前的转态值也当作输入
+
+tf.nn.rnn_cell.LSTM（）：
+在LSTM中，两个隐状态储存在同一个变量里（c和h），rnn中只有一个隐状态。
+因rnn样本的依赖关系，所以凡是数据有依赖关系的就可以使用此算法，例如图像识别。
+输入：数据的纬度=每次输入的纬度×输入次数
+tf.nn.dynamic_rnn()：动态输出
+tf.nn.bidirectional_dynamic_rnn()：双向RNN
+tf.concat()：两个向量拼接
+
+GAN：
+G模型以生成的样本通过检测作为收益，D模型以成功拦截G模型生成的样本作为收益。
+
+过滤重复数据：list(set(aaa))
+
+Pytorch
+y.add_(x):y = y+x
+in-place operation：在pytorch中是指改变一个tensor的值的时候，不经过复制操作，而是直接在原来的内存上改变它的值。可以把它成为原地操作符。
+a.view():改变a的形状，与torch.reshape(input, shape)一样。a本身的形状是不会变的，要想让a的形状变化，比如把结果赋值给a，比如a = a.view(2,5)
+x.mm(w1):x点乘w1，相当于np的dot函数
+torch.cat():拼接，0是按行拼接，默认是0
+
+乘法：torch.mul(input, other, out=None)用input乘以other
+ 除法：torch.div(input, other, out=None)用input除以other
+ 指数：torch.pow(input, exponent, out=None) 
+ 开根号：torch.sqrt(input, out=None) 
+四舍五入到整数：torch.round(input, out=None) 
+argmax函数：torch.argmax(input, dim=None, keepdim=False)返回指定维度最大值的序号，dim给定的定义是：the demention to reduce.也就是把dim这个维度的，变成这个维度的最大值的index
+torch.clamp(input, min, max, out=None)刀削函数，把输入数据规范在min-max区间，超过范围的用min、max代替
+
+Tensor转为numpy: a.numpy()
+numpy转为tensor：torch.from_numpy()
+注意，转换后，numpy的变量和原来的tensor会共用底层内存地址，所以如果原来的tensor改变了，numpy变量也会随之改变。
+
+放在GPU上处理数据：
+device = torch.device(‘cuda’)
+x = x.to(device)
+或者：x.cuda()
+
+torch.randn(*sizes, out=None, dtype=None, layout=torch.strided, device=None, requires_grad=False)：如果要定义需要计算梯度的参数，则requires_grad要设置成True
+torch.nn.Linear()：相当于一个全连接层
+torch.nn.sequential()：一个有序的容器，神经网络模块将按照在传入构造器的顺序依次被添加到计算图中执行，同时以神经网络模块为元素的有序字典也可以作为传入参数。
+
+
+大致顺序：
+model.forward(x)-->torch.nn.MSELoss()(y_pred,y)-->optimizer.zero_grad()-->loss.backward()-->optimizer.step()
