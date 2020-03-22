@@ -1,0 +1,269 @@
+中文分词 词性标注 句法分析 词干提取 词形还原 停用词过滤  词向量化 命名实体消歧  命名实体识别
+
+英文分词：NLTK 中文分词： jieba
+NLTK:
+aaa.concordeance()：查询在aaa文本中某个词出现在哪
+aaa.similar():根据单词在上下文中的用法，返回与给定词相似的词，相似度越高的词排名越靠前。
+text2.common_contexts(['monstrous', 'very']):给出两个词的共同的上下文。这意味着下划线部分可用monstrous 或 very进行填空，而且a_pretty 这个公共上下文出现的频率最大。
+text4.dispersion_plot(['citizens', 'democracy', 'freedom', 'duties', 'America'])：text4 是美国总统就职演说的文本，上述图像打印出了这五个词在演说过程中的分布情况。这可以用来研究随时间推移，语言使用上的变化。
+len(aaa)：一共多少个词
+len(set(aaa)):一共有多少个不同的词（set里的元素是唯一）
+fdist = nltk.FreqDist(text1)：获取词频，是一个集合
+most_common(5):获取次数最多的5个值。
+fdist.plot(20, cumulative=True) # 绘制前20个标识符，并出现次数累加  tabulate以表的形式展示出来
+fdist.hapaxes():该方法会返回一个低频项列表，低频项即出现一次的项。
+fdist.max():该方法会返回出现次数最多的项。
+list(bigrams(['louder', 'words', 'speak']))：根据给定的单词列表，生成所有的双连词组（函数在nltk.util下）
+text2.collocations():获取这种二元组中最频繁搭配的函数
+nltk.corpus:语料库
+aaa.words()：分词，包含标点
+aaa.sents():按句分
+PlaintextCorpusReader：加载自建语料库
+ConditionalFreqDist：条件概率分布函数，可以查看每个单词在各新闻语料中出现的次数
+stopwords：获取停顿词语料库，即信息量少的词（在nltk.corpus下）
+nltk.corpus.words.words()：词汇列表
+nltk.corpus.names：名字语料库
+nltk.corpus.cmudict.entries()：发音的词典
+nltk.corpus.cmudict.dict()：数据格式：前面是词，后面是发音
+
+nltk.word_tokenize()：分词，标点符号也会在内
+nltk.sent_tokenize(text) #对文本按照句子进行分割
+urlopen:  urllib.request.urlopen(‘网络文本路径’)，读取指定网址的内容，打开后read和decode就行了，针对于TXT在线文档下载
+Html的下载读取：在read和decode后，进行ps4.BeatuifulSoup().get_text()才能获取
+nltk.Text():创建TEXT文本
+
+正则表达式的各项内容
+
+词干提取：抽取词的词干或词根形式
+1、PorterStemmer.stem()： 在nltk.stemmer.porter下
+2、LnacasterStemmer.stem(): 在nltk.stem.lancaster下
+3、SnowballStemmer.stem() ：在nltk.stem下
+
+Lemmatization 把一个任何形式的语言词汇还原为一般形式，标记词性的前提下效果比较好
+WordNetLemmatizer.lemmatize('cars'):在 nltk.stem.wordnet下
+
+nltk.regexp_tokenize(text,pattern)：使用正则表达式来分词
+
+中文分词：
+基于词典匹配 基于词频度统计 基于规则（语义、理解）分词
+Jieba.cut：分词，默认是精确模式。paddle模式使用深度学习算法，返回结果是一个生成器，jieba.lcut返回结果是一个列表
+Join方法可使列表转换为字符串格式
+jieba.load_userdict(file_name) ：加载其他词典
+使用 add_word(word, freq=None, tag=None) 和 del_word(word) 可在程序中动态修改词典。
+使用 suggest_freq(segment, tune=True) 可调节单个词语的词频，使其能（或不能）被分出来。
+注意：自动计算的词频在使用 HMM 新词发现功能时可能无效。
+
+关键词提取：
+jieba.analyse.extract_tags()：基于 TF-IDF 算法的关键词抽取
+jieba.analyse.textrank()：基于 TextRank 算法的关键词抽取
+
+jieba.posseg.cut()：返回分词及其词性
+
+词性标注（part of speech tagging）：
+nltk.pos_tag():对指定的单词列表进行词性标记，返回标记列表
+
+nltk.tag.str2tuple()：把词语和词性传入就会返回一个标注的词列表
+nltk.corpus.brown.tagged_words():读取已经标注的语料库
+
+命名实体识别（NER）:https://github.com/Lynten/stanford-corenlp
+Stanford NER：只提供通用的识别
+
+词向量
+Embedding：在数学上是一个映射f(x)-->y，每个y只有唯一的x对应
+在深度学习上：
+嵌入层长度可以设置（长度为原来的0.01-0.1倍之间）；
+1、映射过程是全连接；
+2、嵌入层的值可训练；
+3、由高纬度映射到低纬度，减少参数量
+word2vec属于Embedding的一种方式
+
+word2vec:跳字模型（skip-gram）、连续词袋模型（CBOW）
+训练方法：负采样、层序softmax
+API:gensim.models.Word2Vec() 分词后传入
+model = Word2Vec(sentences, hs=1,min_count=1,window=3,size=100)
+model.wv.save_word2vec_format(os.path.join(cooked_corpus_path,'vec.txt'),
+binary=False)：储存训练好的词向量，格式为word:vector，不可再训练
+两个词的相似度：model.wv.similarity()
+词向量： vector = model.wv['computer']      
+所有词向量：model.wv.vectors  所有词：model.wv.vocab.keys()
+
+GloVe: 所需要的公式是按需要人为构造出来的。
+当所有词向量得到后，使用一个词的中心词向量和背景词向量之和作为该词的最终词向量
+pip install glove_python 
+自己训练：https://blog.csdn.net/sinat_26917383/article/details/83029140
+使用预训练的词向量：mxnet这个库里
+
+
+fastText：在skip-gram基础上，把单词拆分成子词
+from gensim.models import FastText
+
+Seq2seq:
+encoder-decoder结构,encoder负责将输入序列压缩成指定长度的向量，这个向量就可以看成是这个序列的语义，这个过程称为编码,而decoder则负责根据语义向量生成指定的序列，这个过程也称为解码.
+中文-->数值化-->one hot-->embedding
+编码器数据倒叙输入  解码器的每个时刻都有c的输入
+加入attention机制
+
+Attention：重点是求α，即权重。Encoder的一个输入是decoder的所有隐状态与α的乘积
+
+Transformer:
+每个编码器结构相同，但是不共享权重。每一个编码器由两个子层组成。
+Attention机制
+Q：指的是query
+K：指的是key
+V：指的是value,KV通常指同一数据
+Selfattention的作用可类比rnn，可以说是selfattention可取代rnn
+LayerNormalization：针对深度网络的某一层的所有神经元的输入进行normalize操作
+只有全连接层和attention，运算是并齐的，每个字向量里包含所有字的信息
+位置编码：每个位置的编码是唯一的，纬度与字向量纬度一样，使用的公式是认为构造的
+多头机制：多组q k v矩阵与向量点乘，类似CNN多个卷积核
+seq2seq能做的，transformer都能做
+transformerXL:transformer+RNN
+
+Elmo:采用两个双向多层的lstm训练，是一个预训练词向量模型 最终表示（ELMo）就是原始词向量和两个中间词向量的加权和
+https://github.com/zlsdu/Word-Embedding/blob/master/elmo/elmo_report.md
+
+Bert：基于transformer中的encodeer部分
+1、masked LM:随机遮挡或替换一些词，然后用其余部分预测这些词
+2、预测两个句子是否是上下文关系
+预训练时两个模型是一起训练的，损失函数是两个的相加
+ERNIE：与bert类似，专门用于中文的，即中文处理版的bert
+把elmo里的lstm换成transformer，两者基本等同
+参考文章：
+https://blog.csdn.net/jiaowoshouzi/article/details/89388794
+input_ids:每个字在vocabulary中的id，补全符号对应的id为0,应注意的是，在中文BERT模型中，中文分词是基于字而非词的分词
+input_mask：真实字符/补全字符标识符，真实文本的每个字对应1，补全符号对应0，[CLS]和[SEP]也为1。
+segment_ids：句子A和句子B分隔符，句子A对应的全为0，句子B对应的全为1。但是在多数文本分类情况下并不会用到句子B，所以基本不用管。
+
+
+
+
+GPT：transformer的decodeer，单向
+
+ALBERT：
+减少参数数量的方法：
+1、embedding时用one hot先映射到低维，再从低维到高维
+2、Transformer中共享参数
+其他相比于bert，更改的地方：
+1、NSP（上下文）改为sop（句间连贯）
+移除dropout（大规模数据集上没有发现过拟合）
+ALBERT解决的是训练时候的速度提升，预测阶段还是需要和BERT一样的时间
+
+XLNET
+排列语言模型：XLNet采取了Attention掩码的机制，你可以理解为，当前的输入句子是X，要预测的单词Ti是第i个单词，前面1到i-1个单词，在输入部分观察，并没发生变化，该是谁还是谁。但是在Transformer内部，通过Attention掩码，从X的输入单词里面，也就是Ti的上文和下文单词中，随机选择i-1个，放到Ti的上文位置中，把其它单词的输入通过Attention掩码隐藏掉，于是就能够达成我们期望的目标（当然这个所谓放到Ti的上文位置，只是一种形象的说法，其实在内部，就是通过Attention Mask，把其它没有被选到的单词Mask掉，不让它们在预测单词Ti的时候发生作用，如此而已。看着就类似于把这些被选中的单词放到了上文Context_before的位置了）。
+双流自注意力：一套能看到自己，另一套不能看到自己，两套参数是一样的
+
+CRF：常用的是给定条件X下的马尔科夫场。需了解无向图和极大团。
+如果给定的马尔科夫随机场（MRF）中每个随机变量下面还有观察值，我们要确定的是给定观察集合下，这个MRF的分布，也就是条件分布，那么这个MRF就称为 Conditional Random Fields (CRF)。它的条件分布形式完全类似于MRF的分布形式，只不过多了一个观察集合X。所以, CRF本质上是给定了条件(观察值observations)集合的MRF
+使用一个指数模型来表示整个标签序列的联合概率, 这个概率条件依赖于给定的完整观察序列。因此，在不同状态下，不同特征的权重可以相互抵消。也就是说CRF是一个以观测序列X为全局条件的随机场.
+https://www.zhihu.com/question/53458773
+API:tf.contrib.crf
+序列标注：BiLSTM+CRF、BiLSTM+CNN+CRF
+
+文本分类：https://github.com/gaussic/text-classification-cnn-rnn
+
+文本聚类：使用tfidf后把值转为array格式，再进行下一步
+
+命名实体识别：
+通用实体分类：人名 地名 组织机构名 时间日期 专有名词
+三大类：实体类 时间类 数字类
+七小类：人名 地名 组织机构名 时间 日期 货币 百分比
+https://github.com/Determined22/zh-NER-TF
+
+
+变化学习率设置：
+learn_rate_base = 0.1
+def learn_rate_func(epoch):
+return max(0.001, learn_rate_base * (0.9 ** int(epoch / 10)))
+
+过滤重复数据：list(set(aaa))
+
+对句子进行填充：
+tf.contrib.learn.preprocessing.VocabularyProcessor()：自动把文字转为编码，不够的用0填充
+np.random.shuffle()与np.random.permutation()的区别：前者会改变原排列，后者不会改变
+tf.nn.embedding_lookup(params, ids)其实就是按照ids顺序返回params中的第ids行
+tf.truncated_normal():截断的产生正太分布的函数，就是说产生正太分布的值如果与均值的差值大于两倍的标准差，那就重新生成
+argparse.ArgumentParser 此模块用来解析命令行参数:https://blog.csdn.net/vcvycy/article/details/88600134
+torch.squeeze() 这个函数主要对数据的维度进行压缩，去掉维数为1的的维度，默认是将a中所有为1的维度删掉，维度不为1删不掉。也可以通过dim指定位置，删掉指定位置的维数为1的维度。
+torch.unsqueeze()这个函数主要是对数据维度进行扩充。需要通过dim指定位置，给指定位置加上维数为1的维度。
+collections.Counter():统计词频
+列表转为字符串：" ".join(a) 前提是列表a中的元素全是str类型
+
+文字转为id：word_to_id = dict(zip(words, range(len(words))))
+将id表示的内容转换为文字：''.join(words[x] for x in content)
+可用keras里的Tokenizer直接得到word_to_id，
+t = keras.preprocessing.text.Tokenizer()  t.word_index就是一个字典 t.texts_to_sequences()是直接把句子按分配好的索引数字排列
+
+# 使用keras提供的pad_sequences来将文本pad为固定长度：
+x_pad = kr.preprocessing.sequence.pad_sequences(data_id, max_length)
+# 将标签转换为one-hot表示：y_pad = kr.utils.to_categorical(label_id, num_classes=len(cat_to_id))
+
+打乱数据顺序：
+indices = np.random.permutation(np.arange(data_len))
+x_shuffle = x[indices]     y_shuffle = y[indices]
+
+tf.argmax(input,axis)：根据axis取值的不同返回每行或者每列最大值的索引。
+os.listdir() 方法用于返回指定的文件夹包含的文件或文件夹的名字的列表。可以with open(datapath+'/pos'+'/'+pf,encoding='utf-8') as f: 来批量读取一个文件夹下面的多个文件，pf就是os.listdir() 下的一个文件
+
+Keras：
+model = Keras.modes.Sequential()：顺序模型，多层堆叠
+model.add():添加一个层
+model.compile()：用于配置训练模型
+model.fit():以固定数量的轮次（数据集上的迭代）训练模型。注意callbacks和validation_split的指定
+model.evaluate():在测试模式，返回1、误差值和2、评估标准值。
+model.predict()；预测，计算逐批次进行。分类问题用predict_classes，回归问题用predict
+model.get_layer():根据名称（唯一）或索引值查找网络层。
+model.summy():输出模型各层的参数状况
+https://keras.io/zh/models/sequential/
+
+keras.layers.dense():全连接层。
+keras.layers.Dopout():dropput层，rate是多少就丢弃多少
+激活函数可以通过设置单独的激活层实现，也可以在构造层对象时通过传递 activation 参数实现：
+keras.layers.Embedding()：在keras的文本预处理中，会默认保留index=0给这些未知词，所以size=vocab_size+1 。如果需要微调，trainable设为True就可以，导入预训练的词向量：weights=[embedding_matrix] https://www.jianshu.com/p/b6cd9ecdecb7
+t = keras.preprocessing.text.Tokenizer()  t.word_index就是一个字典，word:id形式 t.texts_to_sequences()是直接把句子按分配好的索引数字排列
+# 使用keras提供的pad_sequences来将文本pad为固定长度：
+x_pad = kr.preprocessing.sequence.pad_sequences(data_id, max_length，oov_token=’<oov>’)这个oov就是不在字典里的其他词，全都填充为一个id
+# 将标签转换为one-hot表示：y_pad = kr.utils.to_categorical(label_id, num_classes=len(cat_to_id))
+LSTM：keras.layers.LSTM()
+双向LSTM：keras.layers.Bidirectional(keras.layers.LSTM())
+要叠加LSTM层数，需要指定参数return_sequences = True,默认 False。在输出序列中，返回单个 hidden state值还是返回全部time step 的 hidden state值。 False 返回单个， true 返回全部。keras.layers.GRU()
+keras.layers.Conv1D()：卷积
+keras.layers.MaxPooling1D():池化
+keras.layers.concatenate()：同tf.concatenate()
+
+模型自动保存：
+keras.callbacks.ModelCheckpoint():可指定多少个训练期之后保存模型
+对应加载：latest=tf.train.latest_checkpoint(checkpoint_dir) model.load_weights(latest)
+keras.callbacks.EarlyStopping():当监测值不再改善时中止训练
+keras.callbacks.LearningRateScheduler(schedule, verbose=0)
+模型加载：
+load_model加载的是整个模型（对应models.save_model()），load_weights()加载的是模型参数（对应save_weights()）
+
+
+训练集、验证集：model.fit(x_train, y_train, batch_size=64, epochs=5, validation_data=(x_val, y_val))或者指定validation_split：0~1之间的浮点数，用来指定训练集的一定比例数据作为验证集。fit函数中不论是设置了validation_split还是validation_data，这部分用于validation的数据并不会被用来调整参数，不会被用于更新权重，而是用来跟踪进度检测loss和accuracy，防止过拟合，early stopping，可以防止模型过度训练。
+测试：score = model.evaluate(x_test, y_test, batch_size=16)
+
+去除标点符号：s = ''.join(c for c in word if c not in string.punctuation)针对英文，也可手动给标点符号
+去掉文本中的空格：map(lambda s: s.replace(' ', ''), our_data)
+Sklearn，keras里的数据格式是array格式，pytorch的tensor与numpy的array类似，唯一区别是tensor可以在GPU上运行
+collections.OrderedDict():使以此放入字典的数据有序
+Pandas里的a.apply(func,axis=1)与map函数相似，1是按行
+
+一般来说，要使用某个类的方法，需要先实例化一个对象再调用方法。 
+而使用@staticmethod或@classmethod，就可以不需要实例化，直接类名.方法名()来调用。 @staticmethod不需要表示自身对象的self和自身类的cls参数，就跟使用函数一样。@classmethod也不需要self参数，但第一个参数需要是表示自身类的cls参数。
+
+sorted:先按照成绩降序排序，相同成绩的按照名字升序排序：
+sorted(d1, key=lambda x:(-x['score'], x['name']))
+any(a):列表a里的元素全是空则返回false
+os.sep：根据运行环境自动选择是成为’/’或’\’
+num_batch = int((data_len - 1) / batch_size) + 1
+np.array(aaa)和np.asarray(aaa)的区别：当aaa是np array类型时，前者开辟新的内存id，后者与aaa共id，若aaa是list，那么两者都会开辟新的内存
+
+
+
+
+
+
+
+
+
+
