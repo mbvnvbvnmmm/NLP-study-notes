@@ -1,0 +1,277 @@
+线性回归
+决策树、集成算法
+聚类算法
+KNN
+SVM
+EM
+隐马尔可夫
+贝叶斯算法
+LDA
+特征工程
+
+分类时用要求解释性强的，选择逻辑回归和决策树，此外用SVM效果好，当用SVM效果都不好时，用集成算法。
+
+分类：监督学习、无监督学习、半监督学习
+监督学习：
+1、判别式模型：线性回归 决策树 支持向量机SVM K近邻 神经网络等
+2、生成式模型：隐马尔可夫模型HMM 朴素贝叶斯模型 高斯混合模型GMM LDA等
+无监督学习：聚类 降维 文本处理
+
+机器学习常用库：官方文档：https://scikit-learn.org/stable/modules/classes.html
+https://www.cnblogs.com/wzydj/p/10198594.html
+https://blog.csdn.net/tansuo17/article/details/78742656
+自然语言处理：
+https://blog.csdn.net/weixin_39449466/article/details/81277403#11
+
+Random.seed():定义种子，种子数一样则产生的随机数一样。
+Train_test_split里的random_state=0，填0或者不填，每次的数据不一样，填其他数则每次都是一样的
+Loc/iloc:按行来取数据。A.iloc[:,[0,2]]：所有行的第1,2列
+Apply：apply的返回值就是函数func函数的返回值。A.apply(func,)函数的传入参数根据axis来定，比如axis = 1，就会把一行数据作为Series的数据
+结构传入给自己实现的函数中，我们在函数中实现对Series不同属性之间的计算，返回一个结果，则apply函数会自动遍历每一行DataFrame的数据，最后将所有结果组合成一个Series数据结构并返回。
+Pipeline：Python的sklearn.pipeline.Pipeline()函数可以把多个“处理数据的节点”按顺序打包在一起，数据在前一个节点处理之后的结果，转到下一个节点处理。除了最后一个节点外，其他节点都必须实现'transform()'方法， 最后一个节点需要实现fit()方法即可。当训练样本数据送进Pipeline进行处理时， 它会逐个调用节点的fit()和transform()方法，然后点用最后一个节点的fit()方法来拟合数据。
+若pipeline.fit(x_train,y_train)，则都会实现fit()方法
+Label_binarize：把列表里的类别变成向量形式
+>>> from sklearn.preprocessing import label_binarize>>>
+ label_binarize([1, 6], classes=[1, 2, 4, 6])
+array([[1, 0, 0, 0],       [0, 0, 0, 1]])
+
+Transform与fit：训练一定是在训练集上，测试集的x只用转换就行
+
+样本数据预处理方式：
+1、StandardScaler()：数据标准化 回归模型经常用此
+2、MinMAXScaler:数据归一化 分类模型经常用此
+3、Normalizer：基于矩阵的行，将样本向量转换为单位向量
+
+pd.Categorical( aaa ).codes 这样就可以直接得到原始数据的对应的序号列表，通过这样的处理可以将类别信息转化成数值信息 
+pd.factorize ( )：与Categorical类似
+
+特征选择：从已有的特征中选择出影响目标值最大的特征属性
+SelectKBest(chi,k=3)：选择的筛选方法为chi（卡方系数），选3个特征（默认是10个）
+数据降维：PCA、LDA
+Np.meshgrid(x,y):生成以x为横轴y为纵轴的网格采样点
+Np.dstack(x,y)：x中的元素和y中相同位置的元素一一配对
+GridSearchCV：能够在指定的范围内自动搜索具有不同超参数的不同模型组合
+Astype:改变数据类型
+Imputer:默认为用列均值填充缺省值
+make_gaussian_quantiles:创建一个高斯分布的数据集
+Np.concatenate:数据拼接，默认是按行拼接。
+np.r_是按列连接两个矩阵，就是把两矩阵上下相加，要求列数相等。
+np.c_是按行连接两个矩阵，就是把两矩阵左右相加，要求行数相等。
+plt.pcolormesh的作用在于能够直观表现出分类边界
+Np.flatten():把数组转化为一维数组，扁平化，矩阵类似。
+CountVectorizer()：把文本按词袋法的方式转换为数据
+
+
+
+
+
+线性回归API：LinearRegression, LassoCV, RidgeCV, ElasticNetCV
+Sgd在SKlearn中：http://d0evi1.com/sklearn/sgd/
+线性回归的多项式拓展：Polynomialfeatures 它是使用多项式的方法来进行的，如果有a，b两个特征，那么它的2次多项式为（1,a,b,a^2,ab, b^2），这个多项式的形式是使用poly的效果
+欠拟合用多多项式拓展来解决，过拟合用L1,L2正则化来解决。线性回归实际上就是求θ的值。
+
+梯度下降案例：https://www.jianshu.com/p/aa40508e3cc9
+
+逻辑回归：虽然名字叫”回归” ，但却是一种分类学习方法。使用场景大概有两个：第一用来预测，第二寻找因变量的影响因素。
+逻辑回归常出现在正式报告中，因其解释性强，自己私下可用更优模型
+逻辑回归推导：https://blog.csdn.net/tomxiaodai/article/details/81748795
+代码：https://blog.csdn.net/julialove102123/article/details/78405261
+代码参数详解：https://blog.csdn.net/sun_shengyun/article/details/53811483
+API：LogisticRegression， LogisticRegressionCV 
+Cs：惩罚项系数 cv：几折验证
+Y的值必须是int类型的
+Multi_class:默认是’OVR’二分类，多分类：multinomial
+Lr.predict_proba(test):输出测试集属于哪个类别的概率
+decision_function(X)：计算样本到两个分类器的超平面的距离（返回的距离，或者说是分值）
+ROC曲线实现：https://blog.csdn.net/w1301100424/article/details/84546194
+fpr, tpr, thresholds = metrics.roc_curve(y, scores, pos_label=2)
+计算auc的值：
+lr_auc = metrics.auc(lr_fpr, lr_tpr)
+
+KNN:可用于分类和回归，采取平均或者加权平均的方式，方法有brute和KDtree。（样本数据在一万以内可选择默认的brute方式）
+KDtree模型构建是先找到方差最大的第K维特征，大于中位数的为一侧，小于的在另一侧，接着分别找最大方差一次划分直至只剩最后一个。
+KNeighborsClassifier：KNN分类
+KNeighborsRegressor：KNN回归
+
+决策树：
+信息熵 信息增益 
+ID3算法：最原始的，不支持连续变量，无法处理有特征缺省的样本，不能重复选用特征作为分割点，用信息增益量作为划分依据
+C4.5：在ID3基础上改进，用信息增益率作为依据。跟ID3一样只适合在小规模数据中使用
+CART：分类回归树，用GINI增益作为依据，构建的是二叉树
+API:DecisionTreeClassifier、DecisionTreeRegressor（两个API内部使用的算法都是CART）
+决策树剪枝：前置剪枝、后置剪枝，在API中只有前置剪枝，因为后置剪枝太麻烦了，需要计算每一个剪枝系数，交叉验证寻找最佳。
+
+集成学习：
+Bagging:算法可以为大多数普通算法（指定某一种为基本算法）。有放回的抽样指的是抽一条，然后放回去，抽了n条(原始数据集一共也是n条)，会抽到重复的数据，重复数据的作用是让算法在训练时具有一定的数据偏向性。这种有放回抽样会有 63.2% 的样本出现在采样集中，而剩下的 36.8% 样本可以作为验证集对模型的泛化性能进行包外估计。
+随机森林：算法只有决策树。决策树算法每次选择的是全局最优，随机森林每次从所有数据属性里挑出一部分属性，找局部最优，然后多个决策树叠加。决策树的深度不要大于3（弱分类器数量越多深度越小为好）
+API:RandomForestClassifier、RandomForestRegressor
+Extra tree ：在随机森林（RF）基础上，每个子树采用的是原始数据集，每次的特征选择是随机的，更具有泛化能力，若使用随机森林存在过拟合的情况，则可以考虑extra tree。
+TRTE：先进行高维映射，之后再用高维数据进行分类回归（类似于线性回归里的多项式拓展，拓展开来后在进行数据处理）。映射到高维特征后就可继续使用监督学习的各种分类回归算法了
+Isolation forest：利用平均叶子深度来进行判断是否是异常值。每棵树并不能直接判断数据是否异常，只能输出一个深度，最后利用深度代入公式来判断。
+
+Boosting算法：
+Adaboost:第一次的弱分类器样本权重是一样的，先划分，得到一个错误率，根据错误率可得本次弱分类器结果的权重。第二次每个样本的权重取决于上次的预测是否正确，若正确样本权重就大，反之则小。一次迭代。
+API:AdaBoostClassifier、AdaBoostRegressor
+
+GBDT:每次对样本进行更新，每次用残差作为输入值。模型只支持决策树CART
+API:GradientBoostingClassifier、GradientBoostingRegressor(速度慢，很少用)
+
+Stacking：不同模型得到的输出，作为新的特征来与真实值来再用一个模型训练，现在用得很少，被深度学习神经网络取代了。
+
+聚类
+Kmeans:初始质心是随机的，k是用户给定的，每次迭代以每个簇的均值作为新的划分中心。（使用中位数作为划分标准的方叫K中值聚类）。对初始划分点和K值很敏感，特殊值对划分影响大。
+API：Kmeans 因为是聚类划分，没有训练集和测试集之分
+二分Kmeans：弱化初始质心的一种算法，每次将一个簇划分为两个簇（一开始所有的统一为一个簇）
+Kmeans++：与KMeans的区别在于初始的K个中心选择上，基于最大距离来选择（Kmeans是随机的K个点。）
+Kmeansll：先随机选K个点，进行o次，然后用选出来的这些点用Kmeans方法选出K个中心点。最后用这K个点作为原始数据的中心点。
+注：三种Kmeans变种都是用来解决原始Kmeans的K值敏感问题的。
+MiniBathKMeans（API名）: 分隔数据集，训练第一部分训练集得到K个中心点，导入第二部分继续训练，迭代完所有部分。（适用于大规模数据下）
+Canopy算法：目前无现成的API，使用得很少。在距离R1范围内的是可能属于同一个簇，在R2范围内的就是一个新簇，一定属于同一个簇，若在R2内就把该样本在原始队列中删除，同时中心点为所有R2内的均值。迭代所有样本。
+
+层次聚类：
+1、凝聚的层次聚类（AGNES算法）：自底向上
+API:AgglomerativeClustering 一般选最小距离法（效率慢）
+凝聚层次聚类优化算法：
+BIRCH算法（平衡迭代削减聚类法）：三元组里存放相应信息，在给定限制距离内的就归为一个簇。限制了根节点有多少个簇，一个簇限制了最大样本数，超出的话就分裂。可以动态构建，可用于大规模数据集里。
+API:Birch
+
+2、分裂的层次聚类（DIANA算法）：自顶向下（类似于二分Kmeans）
+
+密度聚类：
+DBSAN：都是密度大的区域会连起来被找到归为一个簇
+API：DBSCAN
+
+MDCA：先找到密度最大的那个中心，以此为簇中心，判断离它最近的M样本密度是否大于给定密度，若大于就归为这个簇，拿出这个簇的所有样本，按此方法归类剩余样本，这样就会得到一个一个的簇，最后用凝聚层次聚类的方法，两个簇件距离小于给定聚类就合并这两个簇成为一个簇。
+
+谱聚类：拉普拉斯变换，很少应用 API:SpectralClustering
+
+SVM支持向量机
+线性可分数据：找到分隔的超平面，划分为两部分。
+线性不可分：用多项式核函数或者高斯核函数（主要用这个，参数少）做一个多维扩展之后再划分。
+g(x)=wx+b，用SMO算法算出β之后就可得到w和b。SMO算法是每次挑选2个β来优化（因为要满足β*y=0这个条件，以此优化一个保证不了此等式）
+SVM主要用于分类，回归效果不好。
+API:
+LinearSVC：线性可分
+SVC：用于一切，由参数控制
+nuSVC:多了一个容错率的超参。
+OneClassSVM；异常点检测
+
+Kernel=‘rbf’，选择的是高斯核函数。γ值越大，拟合越好，可能导致过拟合，越小泛化能力越强，可能导致欠拟合。 
+惩罚项系数C越大，泛化能力越差，容易出现过拟合，越小，泛化能力越强，容易出现欠拟合
+多标签及多分类算法：
+单标签多分类：
+OVO:一对一，拆分为多个两两结合的二分类OneVsOneClassifier
+OVR：一对多，分为该类和其他类OneVsRestClassifier
+Error Correcting Output codes(纠错码机制)：多对多  OutputCodeClassifier
+多标签：
+Binary Relevance(first-order)：把每个标签作为一个模型来训练 API:MultiOutputClassifier
+
+Classifier Chains(high-order):先打乱标签顺序，训练第一个模型，随后把第一个模型的y值作为第二模型的x中的一维向量，以此类推。
+API：ClassifierChain
+
+Calibrated Label Ranking(second-order)：寻找两两之间的属性问题，用得比较少
+
+贝叶斯算法：有监督的分类算法，多用于文本领域，其他地方很少用到
+条件：特征之间必须是相互独立的
+高斯朴素贝叶斯：服从高斯分布 API：GaussianNB
+伯努利贝叶斯：服从伯努利分布 API：BernoulliNB
+多项分布贝叶斯：MultinomialNB
+互补朴素贝叶斯：是多项式贝叶斯的一种改进 ComplementNB 
+
+注：如果x是连续的，一般选高斯朴素贝叶斯，若x离散，选多项式，若x既有连续又有离散，选高斯。
+
+文本的TF/IDF算法：TfidfVectorizer
+
+EM算法：一种迭代算法，不知道模型的参数以及一些隐含条件，与极大似然估计的最大区别就是不知道所属类别（大致可以如此理解）。先估计参数θ，得到在此参数下的概率分布，极大化联合概率的情况下得到新的θ，重复直至收敛。
+
+GMM：高斯混合模型，API：GaussianMixture
+
+隐马尔可夫算法（https://blog.csdn.net/weixin_41923961/article/details/82750687）
+马尔科夫性质：第n个状态只与第n-1个状态有关，与其他的无关
+马尔科夫链：状态的概率最终是收敛于同一值的，与初始值无关，只与状态转移矩阵有关。
+HMM的两个性质：
+1、在所有条件给定时，t时刻的状态只与t-1时的状态有关
+2、在所有条件给定时，t时刻的观测值只与t时的状态有关
+前向算法和后向算法：求观测概率的两种算法，一个是从前往后推，一个是从后往前推。
+
+学习问题：
+如果训练数据包含状态序列和观测序列，则是有监督的，如果只包含观测序列则是无监督的需要用EM算法解决。
+GaussianHMM和GMMHMM是连续观测状态的HMM模型，而MultinomialHMM是离散观测状态的模型
+logprod, box_index = model.decode(se, algorithm='viterbi')
+Logprod是概率，box_index是状态序列，decode（）这个函数求的是对应是se观测序列时，返回最可能的隐藏状态。
+
+主题模型：
+NMF：非负矩阵分解
+加了L1正则的基本都采用坐标轴下降法求解。
+LDA：第三方库lda.LDA
+Sklearn:LatentDirichletAllocation
+
+数据处理：
+解决数据不平衡问题：
+1、可设置数据不同的权重。在一般模型里的class_weight中，有两种，一是直接定义标签的比重class_weight={0:0.6,1:0.4}，这里的标签为0和1，第二种是，class_weight="balanced"，这里权重与数据量大小成反比。一般情况下使用balance就行
+2、下采样/欠采样:从占多数的数据里随机取一部分数据作为可用数据
+3、集成下采样/欠采样
+4、上采样/过采样
+5、转换为异常点检测问题，多数数据作为正常数据，不符合正常数据的点就是少数数据
+6、Smote算法（http://www.shataowei.com/2017/12/01/python开发：特征工程代码模版-一/）
+
+特征转换
+分词：jieba 模块
+文本转数据：词袋法是统计单词出现的次数，TFIDF体现的是文本的重要性，也就是说间接把文本信息转换为了数字矩阵信息
+API：CountVectorizer HashingVectorizer  TfidfVectorizer TfidfTransformer
+常用的是TfidfVectorizer，分词时需选择空格分开
+缺省值填充：API:Imputer 一般是按列填充均值，axis=0
+哑编码：API：OneHotEncoder，要求数据必须是数值类型的。要求类别之间的等级是一样的，即没有高下之分。编码位数由列的属性种类确定
+二值化：Binarizer  （延伸：多值化）
+标准化：API：StandardScaler 将数据（列）转换为服从标准正太分布。
+区间缩放法（归一化）：API:MinMaxScaler 将数据（按列来）缩放为指定的区间数据
+正则化：API:Normalizer 按行处理
+标准化会改变数据的分布情况，归一化不会，标准化的主要作用是提高迭代速度，降低不同维度之间影响权重不一致的问题。
+升维：
+多项式扩展：API：PolynomialFeatures
+用核函数升维（在SVM中提到过）
+特征选择：
+常用卡方检验SelectKBest（chi），要求特征数据不能为负数
+相关系数法：SelectKBest（f_regression）
+降维：
+PCA：无监督，高维映射到低维，第一坐标轴选择使得数据方差最大的方向
+LDA：API:LinearDiscriminantAnalysis 有监督，指定降到的纬度，不能大于标签Y取值的n-1。例如y有4个取值，降到的纬度不能超过3维。最后使得投影后类内方差最小，类间方差最大
+
+项目：
+垃圾邮件分类：
+Jieba.cut(aaa)：分词 有精准模式（默认模式）、全模式（尽可能的多分词）和关闭隐马尔可夫模式，默认参数是精准模式，用默认的就行 
+Jieba.posseg.cut(aaa):可分词并且把词性显示出来
+Jieba.load_userdict(‘txt地址’)：划分/合并新词，可在txt文件（用notepad++打开并选好编码格式）中先创建新词，后面的划分就会把自己建造的词给单独划分出来了
+注意：英文不需要分词，因为自带空格
+sys.exit()：调试时经常用到，后面的代码不会再执行，空格里可写任何字符串，可写所在的行数进行标记。
+os.listdir(‘aaa’)返回指定路径下的所有文件和文件夹的名字的列表
+
+精确率与召回率：找正例的用精确率，找反例的用召回率
+
+aaa.replace(***,***,regex=True) 这里的regex就是把正则打开，否则识别不了
+
+select_dtypes:筛选指定行或者列的特定类型
+
+
+数据的重新保存：df.to_csv(‘./***.csv’)
+
+dropna 对特定的列进行操作需要加参数subset=**
+Tril函数：得到上（或者下）三角的矩阵，另一部分以0填充
+Stack函数：df里面，更改一下数据展现的方式，这个就是把行列号放前面，数值放后面，三者在同一直线上显示出来。
+pd.get_dummies()：给数据进行哑编码
+Metrics模块：SK里，含有准确率召回率的评分模块。
+读取数据时，skiprows 可以跳过文件的前几行
+
+统计每个特征包含的不同项:value_counts
+
+
+
+机器学习项目要点：实际工作中数据清洗工作占很大一部分，需要了解特征的重要程度，删除不重要的部分，并合理转化。之后是模型的选择训练调整复盘。
+
+常见几种机器学习算法的优缺点：
+https://www.jianshu.com/p/956f035544af
+
+
+
+ 
+
